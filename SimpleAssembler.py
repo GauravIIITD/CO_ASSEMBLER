@@ -169,7 +169,7 @@ def main():
                         lock = 1
                         break
                     #Checking for floating point input
-                    if not (0<= float_decimalToBinary <= 31.50) and (a[2][0] == "$" and a[0]=='movf'):
+                    if not (0<= float_decimalToBinary <= 124) and (a[2][0] == "$" and a[0]=='movf'):
                         print("Invalid floating point input!! : line no.", lno)
                         lock=1
                         break   
@@ -315,22 +315,23 @@ def main():
 def decimalToBinary(n):
     return bin(n).replace("0b", "")
 def float_decimalToBinary(n):
-    integer = int(n)
-    floating_no=n%1
-    integer=decimalToBinary(integer)
-    float_res=""
-    for i in range(0,5):
-        floating_no*=2
-        bit=int(floating_no)
-        if (bit==1):
-            floating_no-=1
-            float_res+="1"
+    for i in range(n%1):
+        if (n//(2**i)==1):
+            val = 2**i
+            break
+    exp = decimalToBinary(val)
+    val2 = n/(2**i)
+    val2 -= 1
+    a = 5
+    while (a):
+        val2 = val2*2
+        temp = val2//1
+        if (temp==1):
+            val2 = val2 - 1
+            exp += '1'
         else:
-            float_res+="0"
-    print(integer,float_res)
-    exp = len(integer)
-    print(decimalToBinary(exp),integer[:exp],float_res[:5-exp])
-    res= '0'*(3-len(decimalToBinary(exp))) + decimalToBinary(exp) + integer[:exp] + float_res[:5-exp]
-    print(res)
-    return res
+            exp += '0'
+        a-=1
+    return exp
+
 if __name__ == "__main__": main()
