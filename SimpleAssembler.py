@@ -169,12 +169,12 @@ def main():
                         lock = 1
                         break
                     #Checking for floating point input
-                    if not (0<= float_decimalToBinary <= 124) and (a[2][0] == "$" and a[0]=='movf'):
+                    if not (0<= float(a[2][1:]) <= 124) and (a[2][0] == "$" and a[0]=='movf'):
                         print("Invalid floating point input!! : line no.", lno)
                         lock=1
                         break   
                     #checking for integer input
-                    if not (0 <= int(a[2][1:]) <= 255 and a[2][0] == "$"):
+                    if not (0 <= int(a[2][1:]) <= 255) and (a[2][0] == "$"):
                         print("Invalid integer input !! : line no.", lno)
                         lock = 1
                         break
@@ -213,7 +213,7 @@ def main():
                     lcount += 1
                     vcount += 1
                 if ((a[0] == "movf" and a[2][0] == "$")):
-                    binaryvalue = float_decimalToBinary(int(a[2][1:]))
+                    binaryvalue = float_decimalToBinary(float(a[2][1:]))
                     imm = binaryvalue
                     bin = code[a[0]] + reg[a[1]] + imm
                     mc.append(bin)
@@ -320,6 +320,7 @@ def float_decimalToBinary(n):
             val = 2**i
             break
     exp = decimalToBinary(val)
+    exp = '0'*(3-len(exp)) + exp
     val2 = n/(2**i)
     val2 -= 1
     a = 5
