@@ -315,18 +315,20 @@ def main():
 def decimalToBinary(n):
     return bin(n).replace("0b", "")
 def float_decimalToBinary(n):
-    for i in range(n%1):
+    for i in range(int(n)):
         if (n//(2**i)==1):
-            val = 2**i
+            val = i
+            break
+        if (n//(2**i)==0):
             break
     exp = decimalToBinary(val)
     exp = '0'*(3-len(exp)) + exp
     val2 = n/(2**i)
     val2 -= 1
     a = 5
-    while (a):
+    while (a):  
         val2 = val2*2
-        temp = val2//1
+        temp = int(val2)
         if (temp==1):
             val2 = val2 - 1
             exp += '1'
