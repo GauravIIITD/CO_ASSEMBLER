@@ -1,8 +1,7 @@
-#Assembler section along with floating point handling
 #Dictionary containing  all the opcodes operations and respective codes
 code = {"add": "10000", "sub": "10001", "mov": "10010", "ld": "10100", "st": "10101", "mul": "10110",
         "div": "10111", "rs": "11000", "ls": "11001", "xor": "11010", "or": "11011", "and": "11100", "not": "11101",
-        "cmp": "11110", "addf": "00000", "subf": "00001", "movf": "00010",
+        "cmp": "11110",
         "jmp": "11111", "jlt": "01100", "jgt": "01101", "je": "01111", "hlt": "01010"}
 typeE = {"jmp": "11111", "jlt": "01100", "jgt": "01101", "je": "01111"}
 typeB = {"rs": "11000", "ls": "11001", "mov": "10010","movf":"00010"}
@@ -80,7 +79,7 @@ def main():
                     lorder[a[0][0:-1]] = "0" * (8 - len(decimalToBinary(lcount))) + decimalToBinary(lcount)
                     del a[0]
                 # identify the use of the flag as legal or not
-                if a[0] in code and (a[0] != "mov" or a[0] != "movf"):
+                if a[0] in code and a[0] != "mov" and a[0] != "movf":
                     for i in range(len(a)):
                         if a[i] == "FLAGS":
                             print("Illegal use of FLAGS register!: line no.", lno)
@@ -89,6 +88,7 @@ def main():
                             break
                 if xyz:
                     break
+                # identify the use of the flag as legal or not
                 # identify the use of the flag as legal or not
 
                 if a[0] not in code and a[0] != "var" :
@@ -137,7 +137,6 @@ def main():
                     lock = 1
                     break
 
-
                 if a[0] == "var":
                     v.append(a[1])
                     lno+=1
@@ -145,7 +144,7 @@ def main():
                 if (a[0] in typeA):
 
                     if a[1] not in reg or a[2] not in reg or a[3] not in reg:
-                        print("Illegal reg reference!: line no.", lno)
+                        print("illegal reg reference!: line no.", lno)
                         lock = 1
                         break
 
@@ -156,7 +155,7 @@ def main():
                 #checking for LABELS initialisation correctly or not in TYPE E
                 if (a[0] in typeE):
                     if a[1] in v:
-                        print("Label cannot be initialised with name similar to var , error in line no.", lno)
+                        print("label cannot be initialised with name similar to var , error in line no.", lno)
                         lock = 1
                         break
 
@@ -169,17 +168,15 @@ def main():
                         lock = 1
                         break
                     #Checking for floating point input
-                    if not (0<= float(a[2][1:]) <= 124) and (a[2][0] == "$" and a[0]=='movf'):
-                        print("Invalid floating point input!! : line no.", lno)
-                        lock=1
-                        break   
+                    if not (0<=int(float(a[2][1:]))<=123) and a[2][0] == "$" and a[0]=="movf":
+                        print("Invalid floating point input !! : line no.",lno)
                     #checking for integer input
-                    if not (0 <= int(a[2][1:]) <= 255) and (a[2][0] == "$"):
+                    if not (0 <= int(a[2][1:]) <= 255) and a[0] == "mov" and a[2][0] == "$":
                         print("Invalid integer input !! : line no.", lno)
                         lock = 1
                         break
+                    #Now checking for the jump and jump greater than and less than 
 
-                #Now checking for the jump and jump greater than and less than 
                 if a[0] == "jmp" or a[0] == "jlt" or a[0] == "jgt" or a[0] == "je":
 
                     bin = code[a[0]] + "000"
@@ -202,19 +199,19 @@ def main():
                     # jump to address
                     else:
                         z = 0
+                if ((a[0] == "movf" and a[2][0] == "$")):
+                    binaryvalue = float_decimalToBinary(float(a[2][1:]))
+                    imm = binaryvalue
+                    bin = code[a[0]] + reg[a[1]] + imm
+                    mc.append(bin)
+                    lcount += 1
+                    vcount += 1
                 if ((a[0] == "mov" and a[2][0] == "$") or a[0] == "rs" or a[0] == "ls") and (a[2] not in reg):
                     #Conversion of the binary to decimal
                     binaryvalue = decimalToBinary(int(a[2][1:]))
 
                     imm = "0" * (8 - len(str(binaryvalue))) + str(binaryvalue)
 
-                    bin = code[a[0]] + reg[a[1]] + imm
-                    mc.append(bin)
-                    lcount += 1
-                    vcount += 1
-                if ((a[0] == "movf" and a[2][0] == "$")):
-                    binaryvalue = float_decimalToBinary(float(a[2][1:]))
-                    imm = binaryvalue
                     bin = code[a[0]] + reg[a[1]] + imm
                     mc.append(bin)
                     lcount += 1
@@ -311,7 +308,8 @@ def main():
         for i in mc:
             if lock ==0:
                 print(i)
-            
+
+
 def decimalToBinary(n):
     return bin(n).replace("0b", "")
 def float_decimalToBinary(n):
